@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { createContext, useContext, useState } from "react";
 import { loginRequest, registerRequest, verifyTokenRequest } from "../api/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserRequest } from "../api/users";
 
 
 const AuthContext = createContext();
@@ -27,12 +28,17 @@ export const AuthProvider = ({ children }) => {
     }
   }, [errors]);
 
+  const getUser = async () => {
+    const res = await getUserRequest();
+    setUser(res.data);
+    return res.data
+  }
+
   const signup = async (user) => {
     try {
       const res = await registerRequest(user);
       if (res.status === 200) {
-        setUser(res.data);
-        setIsAuthenticated(true);
+        await signin(user)
       }
     } catch (error) {
       setErrors(error.response.data.message);
@@ -42,6 +48,9 @@ export const AuthProvider = ({ children }) => {
   const signin = async (user) => {
     try {
       const res = await loginRequest(user);
+      const tokenHeader = res.headers.get("set-cookie")[0]
+      const token = tokenHeader.split(";")[0].split("=")[1]
+      await AsyncStorage.setItem("token", token);
       setUser(res.data);
       setIsAuthenticated(true);
 
@@ -50,12 +59,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
 
-    AsyncStorage.removeItem("token").then(() => {
-    })
-    setUser(null);
-    setIsAuthenticated(false);
+    try {
+      await AsyncStorage.removeItem("token")
+      setUser(null);
+      setIsAuthenticated(false);
+      return true
+    } catch (error) {
+      console.error(error);
+    }
+
   };
 
   useEffect(() => {
@@ -95,6 +109,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         errors,
         loading,
+        getUser
       }}
     >
       {children}
