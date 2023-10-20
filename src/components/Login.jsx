@@ -3,11 +3,12 @@ import { Image, ImageBackground, StyleSheet, Text, View, TextInput, TouchableOpa
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from "../context/authContext";
+import Loading from './Loading';
 
 
 const Login = () => {
 
-    const { signin, errors, isAuthenticated } = useAuth();
+    const { signin, errors, isAuthenticated, loading } = useAuth();
 
     const navigation = useNavigation();
 
@@ -58,70 +59,75 @@ const Login = () => {
     const handleUsername = (text) => setUsername(text)
 
     return (
-        <View style={styles.container}>
-            <ImageBackground source={image} resizeMode="cover" style={styles.image}>
-                <View style={styles.container2}>
+        <>
+            <Loading visible={loading} />
 
-                    <Text style={styles.bienvenido}> Bienvenido </Text>
-                    <Text style={styles.descripcion}> Puedes crear, guardar, editar y borrar tus notas. </Text>
+            <View style={styles.container}>
+                <ImageBackground source={image} resizeMode="cover" style={styles.image}>
+                    <View style={styles.container2}>
 
-                    <Image source={require('../../assets/logo.png')} />
+                        <Text style={styles.bienvenido}> Bienvenido </Text>
+                        <Text style={styles.descripcion}> Puedes crear, guardar, editar y borrar tus notas. </Text>
 
-                    <View style={styles.inputView} >
-                        <View style={styles.inputPass} >
+                        <Image source={require('../../assets/logo.png')} />
 
-                            <TextInput
-                                style={styles.inputText2}
-                                placeholder="Usuario"
-                                placeholderTextColor="#003f5c"
-                                onChangeText={handleUsername}
-                                value={username}
-                            />
+                        <View style={styles.inputView} >
+                            <View style={styles.inputPass} >
 
-                        </View>
+                                <TextInput
+                                    style={styles.inputText2}
+                                    placeholder="Usuario"
+                                    placeholderTextColor="#003f5c"
+                                    onChangeText={handleUsername}
+                                    value={username}
+                                />
 
-                    </View>
-
-                    <View style={styles.inputView} >
-
-                        <View style={styles.inputPass} >
-
-                            <TextInput
-                                secureTextEntry={showPassword}
-                                style={styles.inputText2}
-                                placeholder="Contraseña"
-                                placeholderTextColor="#003f5c"
-                                onChangeText={text => setPassword(text)}
-                                value={password}
-                            />
-
-                            <MaterialCommunityIcons
-                                name={showPassword ? 'eye-off' : 'eye'}
-                                size={24}
-                                color="#aaa"
-                                style={styles.icon}
-                                onPress={handleShowPassword}
-                            />
+                            </View>
 
                         </View>
 
+                        <View style={styles.inputView} >
+
+                            <View style={styles.inputPass} >
+
+                                <TextInput
+                                    secureTextEntry={showPassword}
+                                    style={styles.inputText2}
+                                    placeholder="Contraseña"
+                                    placeholderTextColor="#003f5c"
+                                    onChangeText={text => setPassword(text)}
+                                    value={password}
+                                />
+
+                                <MaterialCommunityIcons
+                                    name={showPassword ? 'eye-off' : 'eye'}
+                                    size={24}
+                                    color="#aaa"
+                                    style={styles.icon}
+                                    onPress={handleShowPassword}
+                                />
+
+                            </View>
+
+                        </View>
+                        {message && <Text>{message}</Text>}
+                        {errors && <Text>{errors[0]}</Text>}
+
+                        <TouchableOpacity
+                            onPress={handleLogin}
+                            style={styles.loginBtn}>
+                            <Text style={styles.loginText}>Iniciar</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                            <Text style={styles.signupText}>¡No tienes una cuenta? Registrate</Text>
+                        </TouchableOpacity>
                     </View>
-                    {message && <Text>{message}</Text>}
-                    {errors && <Text>{errors[0]}</Text>}
+                </ImageBackground>
 
-                    <TouchableOpacity
-                        onPress={handleLogin}
-                        style={styles.loginBtn}>
-                        <Text style={styles.loginText}>Iniciar</Text>
-                    </TouchableOpacity>
+            </View>
+        </>
 
-                    <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                        <Text style={styles.signupText}>¡No tienes una cuenta? Registrate</Text>
-                    </TouchableOpacity>
-                </View>
-            </ImageBackground>
-
-        </View>
     );
 }
 const styles = StyleSheet.create({

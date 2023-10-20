@@ -6,6 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import ModalCategories from './ModalCategories';
 
 import { useIsFocused } from '@react-navigation/native';
+import Loading from './Loading';
 
 export default function CreateNota() {
 
@@ -19,7 +20,9 @@ export default function CreateNota() {
     const [visible, setVisible] = useState(false);
     const navigation = useNavigation();
 
-    const { createTask, getTask, updateTask, } = useTasks();
+    const { createTask, getTask, updateTask } = useTasks();
+
+    const [loading, setLoading] = useState(false);
 
 
     const isFocused = useIsFocused();
@@ -49,8 +52,9 @@ export default function CreateNota() {
         } else {
             setTitle("");
             setDescripcion("");
-            setCategory("")
-            setMessage("")
+            setCategory("");
+            setMessage("");
+            setLoading(false);
             route.params = {};
         }
 
@@ -60,7 +64,6 @@ export default function CreateNota() {
 
 
     const handleCreateNote = async () => {
-
         if (!title) {
             setMessage("Falta el titulo")
             return
@@ -74,99 +77,115 @@ export default function CreateNota() {
             return
         }
 
-        await createTask({
-            "title": title.trim(),
-            "description": descripcion.trim(),
-            "category": category.trim()
-        });
+        setLoading(true);
 
-        navigation.navigate('Home');
+        if (!loading) {
+
+            await createTask({
+                "title": title.trim(),
+                "description": descripcion.trim(),
+                "category": category.trim()
+            });
+
+
+            navigation.navigate('Home');
+
+
+        }
+
     }
-
 
     const handleEditNote = async () => {
+        setLoading(true);
 
-        await updateTask(route.params.id, {
-            "title": title.trim(),
-            "description": descripcion.trim(),
-            "category": category.trim()
-        });
+        if (!loading) {
 
-        navigation.navigate('Home');
+            await updateTask(route.params.id, {
+                "title": title.trim(),
+                "description": descripcion.trim(),
+                "category": category.trim()
+            });
 
+            navigation.navigate('Home');
+        }
     }
 
+
     return (
-        <View style={styles.container}>
-            <ImageBackground source={image} resizeMode="cover" style={styles.image}>
-                <View style={styles.container2}>
-                    <View style={styles.inputView} >
-                        {
-                            route.params?.id ?
+        <>
+            <Loading visible={loading} />
 
-                                <Text style={styles.title}> EDITAR NOTA </Text>
-                                : <Text style={styles.title}> CREAR NOTA </Text>
-                        }
-
-                        <Text style={styles.descripcion}> Titulo </Text>
-
-                        <TextInput
-                            style={styles.inputText}
-                            placeholder="Titulo..."
-                            placeholderTextColor="#003f5c"
-                            onChangeText={text => setTitle(text)}
-                            value={title}
-
-                        />
-
-                        <Text style={styles.descripcion}> Descripción </Text>
-
-                        <TextInput
-                            multiline={true}
-                            numberOfLines={4}
-                            textAlignVertical="top"
-                            style={{ ...styles.inputText, height: 150 }}
-                            placeholder="Descripción..."
-                            placeholderTextColor="#003f5c"
-                            onChangeText={text => setDescripcion(text)}
-                            value={descripcion}
-                        />
-
-                        <Text style={styles.descripcion}> Categoria </Text>
-
-                        <View style={styles.inputPass} >
-                            <Octicons style={styles.icon} name="tag" size={24} color="black" />
-                            <TouchableOpacity onPress={() => setVisible(true)}
-                                style={styles.loginBtn}>
-                                <Text style={styles.loginText}>Selecciona</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={{ ...styles.inputPass, backgroundColor: "#0EBE7F" }} >
-                            <Octicons style={styles.icon} name="plus" size={24} color="black" />
+            <View style={styles.container}>
+                <ImageBackground source={image} resizeMode="cover" style={styles.image}>
+                    <View style={styles.container2}>
+                        <View style={styles.inputView} >
                             {
-                                route.params?.id ? <TouchableOpacity
-                                    onPress={handleEditNote}
-                                    style={styles.loginBtn}>
-                                    <Text style={styles.loginText}>Editar Nota</Text>
-                                </TouchableOpacity>
-                                    : <TouchableOpacity
-                                        onPress={handleCreateNote}
-                                        style={styles.loginBtn}>
-                                        <Text style={styles.loginText}>Guardar Nota</Text>
-                                    </TouchableOpacity>
+                                route.params?.id ?
 
-
+                                    <Text style={styles.title}> EDITAR NOTA </Text>
+                                    : <Text style={styles.title}> CREAR NOTA </Text>
                             }
+
+                            <Text style={styles.descripcion}> Titulo </Text>
+
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder="Titulo..."
+                                placeholderTextColor="#003f5c"
+                                onChangeText={text => setTitle(text)}
+                                value={title}
+
+                            />
+
+                            <Text style={styles.descripcion}> Descripción </Text>
+
+                            <TextInput
+                                multiline={true}
+                                numberOfLines={4}
+                                textAlignVertical="top"
+                                style={{ ...styles.inputText, height: 150 }}
+                                placeholder="Descripción..."
+                                placeholderTextColor="#003f5c"
+                                onChangeText={text => setDescripcion(text)}
+                                value={descripcion}
+                            />
+
+                            <Text style={styles.descripcion}> Categoria </Text>
+
+                            <View style={styles.inputPass} >
+                                <Octicons style={styles.icon} name="tag" size={24} color="black" />
+                                <TouchableOpacity onPress={() => setVisible(true)}
+                                    style={styles.loginBtn}>
+                                    <Text style={styles.loginText}>Selecciona</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={{ ...styles.inputPass, backgroundColor: "#0EBE7F" }} >
+                                <Octicons style={styles.icon} name="plus" size={24} color="black" />
+                                {
+                                    route.params?.id ? <TouchableOpacity
+                                        onPress={handleEditNote}
+                                        style={styles.loginBtn}>
+                                        <Text style={styles.loginText}>Editar Nota</Text>
+                                    </TouchableOpacity>
+                                        : <TouchableOpacity
+                                            onPress={handleCreateNote}
+                                            style={styles.loginBtn}>
+                                            <Text style={styles.loginText}>Guardar Nota</Text>
+                                        </TouchableOpacity>
+
+
+                                }
+                            </View>
+                            {message && <Text>{message}</Text>}
+
+                            <ModalCategories visible={visible} setVisible={setVisible} setCategory={setCategory} />
+
                         </View>
-                        {message && <Text>{message}</Text>}
-
-                        <ModalCategories visible={visible} setVisible={setVisible} setCategory={setCategory} />
-
                     </View>
-                </View>
-            </ImageBackground >
-        </View>
+                </ImageBackground >
+            </View>
+        </>
     );
 }
 

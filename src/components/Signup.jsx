@@ -3,12 +3,13 @@ import { ImageBackground, StyleSheet, Text, View, TextInput, TouchableOpacity } 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/authContext';
 import { useNavigation } from '@react-navigation/native';
+import Loading from './Loading';
 
 const Signup = () => {
 
     const image = require('../../assets/bg.png');
 
-    const { signup, errors } = useAuth();
+    const { signup, errors, loading } = useAuth();
 
     const [fullname, setFullName] = useState("");
     const [username, setUsername] = useState("");
@@ -48,75 +49,80 @@ const Signup = () => {
 
 
     return (
-        <View style={styles.container}>
-            <ImageBackground source={image} resizeMode="cover" style={styles.image}>
-                <View style={styles.container2}>
+        <>
+            <Loading visible={loading} />
 
-                    <Text style={styles.bienvenido}> Registro </Text>
-                    <Text style={styles.descripcion}> Puedes crear, guardar, editar y borrar tus notas. </Text>
-                    <View style={styles.inputView} >
-                        <View style={styles.inputPass} >
+            <View style={styles.container}>
+                <ImageBackground source={image} resizeMode="cover" style={styles.image}>
+                    <View style={styles.container2}>
 
-                            <TextInput
-                                style={styles.inputText2}
-                                placeholder="Nombre y Apellido"
-                                placeholderTextColor="#003f5c"
-                                onChangeText={text => setFullName(text)}
-                            />
+                        <Text style={styles.bienvenido}> Registro </Text>
+                        <Text style={styles.descripcion}> Puedes crear, guardar, editar y borrar tus notas. </Text>
+                        <View style={styles.inputView} >
+                            <View style={styles.inputPass} >
+
+                                <TextInput
+                                    style={styles.inputText2}
+                                    placeholder="Nombre y Apellido"
+                                    placeholderTextColor="#003f5c"
+                                    onChangeText={text => setFullName(text)}
+                                />
+
+                            </View>
+
+                        </View>
+                        <View style={styles.inputView} >
+                            <View style={styles.inputPass} >
+
+                                <TextInput
+                                    style={styles.inputText2}
+                                    placeholder="Usuario"
+                                    placeholderTextColor="#003f5c"
+                                    onChangeText={handleCheckUsername}
+                                />
+
+                            </View>
 
                         </View>
 
-                    </View>
-                    <View style={styles.inputView} >
-                        <View style={styles.inputPass} >
+                        <View style={styles.inputView} >
 
-                            <TextInput
-                                style={styles.inputText2}
-                                placeholder="Usuario"
-                                placeholderTextColor="#003f5c"
-                                onChangeText={handleCheckUsername}
-                            />
+                            <View style={styles.inputPass} >
 
-                        </View>
+                                <TextInput
+                                    secureTextEntry={showPassword}
+                                    style={styles.inputText2}
+                                    placeholder="Contraseña"
+                                    placeholderTextColor="#003f5c"
+                                    onChangeText={text => setPassword(text)}
+                                />
 
-                    </View>
+                                <MaterialCommunityIcons
+                                    name={showPassword ? 'eye-off' : 'eye'}
+                                    size={24}
+                                    color="#aaa"
+                                    style={styles.icon}
+                                    onPress={handleShowPassword}
+                                />
 
-                    <View style={styles.inputView} >
-
-                        <View style={styles.inputPass} >
-
-                            <TextInput
-                                secureTextEntry={showPassword}
-                                style={styles.inputText2}
-                                placeholder="Contraseña"
-                                placeholderTextColor="#003f5c"
-                                onChangeText={text => setPassword(text)}
-                            />
-
-                            <MaterialCommunityIcons
-                                name={showPassword ? 'eye-off' : 'eye'}
-                                size={24}
-                                color="#aaa"
-                                style={styles.icon}
-                                onPress={handleShowPassword}
-                            />
+                            </View>
 
                         </View>
 
+                        {errors && <Text>{errors[0]}</Text>}
+
+                        <TouchableOpacity
+                            onPress={handleRegister}
+                            style={styles.loginBtn}>
+                            <Text style={styles.loginText}>Registrar</Text>
+                        </TouchableOpacity>
+
                     </View>
 
-                    {errors && <Text>{errors[0]}</Text>}
+                </ImageBackground>
+            </View>
+        </>
 
-                    <TouchableOpacity
-                        onPress={handleRegister}
-                        style={styles.loginBtn}>
-                        <Text style={styles.loginText}>Registrar</Text>
-                    </TouchableOpacity>
-
-                </View>
-
-            </ImageBackground>
-        </View>
     );
 }
 const styles = StyleSheet.create({

@@ -19,14 +19,13 @@ export default function App() {
       <TaskProvider>
         <CategoryProvider>
           <View style={{ marginTop: Constants.statusBarHeight, flexGrow: 1 }}>
-
             <NavigationContainer>
               <Stack.Navigator
                 screenOptions={{
                   headerTransparent: true,
                   headerTitle: '',
-                  headerStyle: { backgroundColor: "transparent" },
-                  headerTitleStyle: { color: "#red" },
+                  headerStyle: { backgroundColor: "transparent", opacity: 0 },
+                  headerTitleStyle: { color: "red" },
                 }}
               >
 
@@ -34,7 +33,7 @@ export default function App() {
                   options={{
                     headerTransparent: true,
                     headerTitle: '',
-                    headerStyle: { backgroundColor: "transparent" },
+                    headerStyle: { backgroundColor: "transparent", opacity: 0 },
                     headerTitleStyle: { color: "#ffffff" },
                   }}
                 />
@@ -48,7 +47,7 @@ export default function App() {
                   options={{
                     headerTransparent: true,
                     headerTitle: '',
-                    headerStyle: { backgroundColor: "transparent" },
+                    headerStyle: { backgroundColor: "transparent", opacity: 0 },
                     headerTitleStyle: { color: "#ffffff", },
                   }}
                 />

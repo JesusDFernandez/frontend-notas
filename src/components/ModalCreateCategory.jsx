@@ -5,6 +5,7 @@ import ModalPoup from "./ModalPoup";
 import { useCategories } from '../context/categoriesContext';
 import { ListIcon } from './listIcon';
 import { ListColor } from './listColor';
+import Loading from './Loading';
 
 const ModalCreateCategory = ({ id, setEditCategory, visibleCreateCategory, setVisibleCreateCategory }) => {
 
@@ -13,6 +14,18 @@ const ModalCreateCategory = ({ id, setEditCategory, visibleCreateCategory, setVi
     const [icons, setIcons] = useState("");
     const [colors, setColors] = useState("transparent");
     const [title, setTitle] = useState("");
+
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+
+        return () => {
+            if (!visibleCreateCategory) {
+                setLoading(false);
+            }
+        }
+    }, [visibleCreateCategory]);
+
 
     useEffect(() => {
         if (id) {
@@ -28,31 +41,41 @@ const ModalCreateCategory = ({ id, setEditCategory, visibleCreateCategory, setVi
 
     const handleCreateCategory = async () => {
 
-        await createCategory({
-            "title": title.trim(),
-            "color": colors.trim(),
-            "icon": icons.trim()
-        });
+        setLoading(true);
 
-        setTitle("");
-        setIcons("");
-        setColors("transparent")
-        setVisibleCreateCategory(false);
+        if (!loading) {
+
+            await createCategory({
+                "title": title.trim(),
+                "color": colors.trim(),
+                "icon": icons.trim()
+            });
+
+            setTitle("");
+            setIcons("");
+            setColors("transparent")
+            setVisibleCreateCategory(false);
+        }
     }
 
     const handleEditCategory = async () => {
+        setLoading(true);
 
-        await updateCategory(id, {
-            "title": title.trim(),
-            "color": colors.trim(),
-            "icon": icons.trim()
-        });
+        if (!loading) {
 
-        setTitle("");
-        setIcons("");
-        setColors("transparent")
-        setVisibleCreateCategory(false);
-        setEditCategory(false);
+            await updateCategory(id, {
+                "title": title.trim(),
+                "color": colors.trim(),
+                "icon": icons.trim()
+            });
+
+            setTitle("");
+            setIcons("");
+            setColors("transparent")
+            setVisibleCreateCategory(false);
+            setEditCategory(false);
+
+        }
     }
 
     const handleTitle = (title) => setTitle(title)
@@ -62,121 +85,125 @@ const ModalCreateCategory = ({ id, setEditCategory, visibleCreateCategory, setVi
     const handleColorEnter = (color) => setColors(color)
 
     return (
-        <View>
-            <ModalPoup visible={visibleCreateCategory}>
-                <View style={{ alignItems: 'center' }}>
-                    <View style={styles.header}>
-                        <TouchableOpacity onPress={() => {
-                            setTitle("");
-                            setIcons("");
-                            setColors("transparent");
-                            setEditCategory(false);
-                            setVisibleCreateCategory(false)
-                        }}>
-                            <Text style={{ fontSize: 20, height: 30, width: 30 }}>x</Text>
+        <>
 
-                        </TouchableOpacity>
+            <View>
+                <ModalPoup visible={visibleCreateCategory}>
+                    <Loading visible={loading} />
+                    <View style={{ alignItems: 'center' }}>
+                        <View style={styles.header}>
+                            <TouchableOpacity onPress={() => {
+                                setTitle("");
+                                setIcons("");
+                                setColors("transparent");
+                                setEditCategory(false);
+                                setVisibleCreateCategory(false)
+                            }}>
+                                <Text style={{ fontSize: 20, height: 30, width: 30 }}>x</Text>
+
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
 
 
-                <View>
-                    <View style={{ flexDirection: "row", gap: 10, marginBottom: 30, borderBottomWidth: 2, paddingBottom: 10, borderBottomColor: 'rgba(0,0,0,0.5)' }}>
+                    <View>
+                        <View style={{ flexDirection: "row", gap: 10, marginBottom: 30, borderBottomWidth: 2, paddingBottom: 10, borderBottomColor: 'rgba(0,0,0,0.5)' }}>
 
-                        {title && colors && icons &&
-                            <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                <View style={{ marginTop: 0, backgroundColor: colors, paddingHorizontal: 25, paddingVertical: 5, borderRadius: 6 }}>
-                                    <FontAwesome5 name={icons} size={20} color="black" />
-                                    <Text numberOfLines={1}
-                                        ellipsizeMode="tail" style={{ textAlign: "center", maxWidth: 100 }}>{title}</Text>
+                            {title && colors && icons &&
+                                <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                    <View style={{ marginTop: 0, backgroundColor: colors, paddingHorizontal: 25, paddingVertical: 5, borderRadius: 6 }}>
+                                        <FontAwesome5 name={icons} size={20} color="black" />
+                                        <Text numberOfLines={1}
+                                            ellipsizeMode="tail" style={{ textAlign: "center", maxWidth: 100 }}>{title}</Text>
+                                    </View>
                                 </View>
-                            </View>
-                        }
+                            }
 
-                        <Text numberOfLines={2}
-                            style={{ maxWidth: 100, flexDirection: "column", marginTop: 10, justifyContent: "center", alignItems: "center", fontSize: 19, textAlign: 'center' }}>
-                            {
-                                id ? "Edita" : "Crea"}  una Categoria
-                        </Text>
-                    </View>
-
-                    <View style={{ gap: 20 }}>
-
-                        <TextInput
-                            style={styles.inputText2}
-                            placeholder="Titulo"
-                            placeholderTextColor="#003f5c"
-                            onChangeText={handleTitle}
-                            value={title}
-                        />
-
-                        <Text style={{ fontSize: 18, }}>Elige un color</Text>
-
-                        <ScrollView style={{ height: 110 }}>
-
-                            <View style={{ flexDirection: "row", flexWrap: 'wrap', justifyContent: "center", alignItems: "center" }}>
+                            <Text numberOfLines={2}
+                                style={{ maxWidth: 100, flexDirection: "column", marginTop: 10, justifyContent: "center", alignItems: "center", fontSize: 19, textAlign: 'center' }}>
                                 {
-                                    ListColor.map((color, index) => (
-                                        <View key={index}>
-                                            <TouchableOpacity
-                                                onPress={() => handleColorEnter(color)}
-                                                style={(colors === color) ? { ...styles.containerHovered } : { ...styles.container }}
+                                    id ? "Edita" : "Crea"}  una Categoria
+                            </Text>
+                        </View>
 
-                                            >
-                                                <Text style={{ backgroundColor: color, borderRadius: 50, width: 50, height: 50, margin: 10 }}>
+                        <View style={{ gap: 20 }}>
 
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </View>
+                            <TextInput
+                                style={styles.inputText2}
+                                placeholder="Titulo"
+                                placeholderTextColor="#003f5c"
+                                onChangeText={handleTitle}
+                                value={title}
+                            />
+
+                            <Text style={{ fontSize: 18, }}>Elige un color</Text>
+
+                            <ScrollView style={{ height: 110 }}>
+
+                                <View style={{ flexDirection: "row", flexWrap: 'wrap', justifyContent: "center", alignItems: "center" }}>
+                                    {
+                                        ListColor.map((color, index) => (
+                                            <View key={index}>
+                                                <TouchableOpacity
+                                                    onPress={() => handleColorEnter(color)}
+                                                    style={(colors === color) ? { ...styles.containerHovered } : { ...styles.container }}
+
+                                                >
+                                                    <Text style={{ backgroundColor: color, borderRadius: 50, width: 50, height: 50, margin: 10 }}>
+
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        ))
+                                    }
+                                </View>
+                            </ScrollView>
+
+                            <Text style={{ fontSize: 18, }}> Elige un icono</Text>
+                            <ScrollView style={{ height: 110 }}>
+                                <View style={{ flexDirection: "row", flexWrap: 'wrap', justifyContent: "center", alignItems: "center" }}>
+
+                                    {ListIcon.map((icon, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            underlayColor="transparent"
+                                            onPress={() => handleIconEnter(icon)}
+                                            style={(icons === icon) ? { ...styles.containerHovered } : { ...styles.container }}
+                                        >
+                                            <Text style={{ margin: 10, textAlign: 'justify' }}>
+                                                <FontAwesome5 name={icon} size={40} color="black" />
+                                            </Text>
+                                        </TouchableOpacity>
                                     ))
-                                }
-                            </View>
-                        </ScrollView>
+                                    }
+                                </View>
+                            </ScrollView>
 
-                        <Text style={{ fontSize: 18, }}> Elige un icono</Text>
-                        <ScrollView style={{ height: 110 }}>
-                            <View style={{ flexDirection: "row", flexWrap: 'wrap', justifyContent: "center", alignItems: "center" }}>
-
-                                {ListIcon.map((icon, index) => (
-                                    <TouchableOpacity
-                                        key={index}
-                                        underlayColor="transparent"
-                                        onPress={() => handleIconEnter(icon)}
-                                        style={(icons === icon) ? { ...styles.containerHovered } : { ...styles.container }}
-                                    >
-                                        <Text style={{ margin: 10, textAlign: 'justify' }}>
-                                            <FontAwesome5 name={icon} size={40} color="black" />
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))
-                                }
-                            </View>
-                        </ScrollView>
-
-                        {id ? <TouchableOpacity onPress={handleEditCategory} >
-                            <View style={{ ...styles.tab, backgroundColor: "#80FFD1" }}>
-
-                                <FontAwesome5 name="plus" size={24} color="black" />
-
-                                <Text >Editar Categoria</Text>
-
-                            </View>
-                        </TouchableOpacity>
-                            : <TouchableOpacity onPress={handleCreateCategory} >
+                            {id ? <TouchableOpacity onPress={handleEditCategory} >
                                 <View style={{ ...styles.tab, backgroundColor: "#80FFD1" }}>
 
                                     <FontAwesome5 name="plus" size={24} color="black" />
 
-                                    <Text >Guardar Categoria</Text>
+                                    <Text >Editar Categoria</Text>
 
                                 </View>
                             </TouchableOpacity>
-                        }
-                    </View>
-                </View>
-            </ModalPoup >
+                                : <TouchableOpacity onPress={handleCreateCategory} >
+                                    <View style={{ ...styles.tab, backgroundColor: "#80FFD1" }}>
 
-        </View >
+                                        <FontAwesome5 name="plus" size={24} color="black" />
+
+                                        <Text >Guardar Categoria</Text>
+
+                                    </View>
+                                </TouchableOpacity>
+                            }
+                        </View>
+                    </View>
+                </ModalPoup >
+
+            </View >
+        </>
     );
 };
 

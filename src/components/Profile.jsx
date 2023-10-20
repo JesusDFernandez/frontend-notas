@@ -98,8 +98,10 @@ export default function Profile() {
     const handleDeleteAccount = async () => {
         try {
             const logouts = await deleteUserRequest();
-            logout();
-            navigation.navigate('Login');
+            const log = await logout();
+            if (log) {
+                navigation.navigate('Login');
+            }
 
         } catch (error) {
             console.error(error);

@@ -18,6 +18,7 @@ export const useTasks = () => {
 export function TaskProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getTasks = async () => {
     const res = await getTasksRequest();
@@ -26,7 +27,9 @@ export function TaskProvider({ children }) {
 
   const deleteTask = async (id) => {
     try {
+
       const res = await deleteTaskRequest(id);
+
       setRefresh(!refresh);
 
       if (res.status === 204) setTasks(tasks.filter((task) => task._id !== id));
@@ -36,14 +39,20 @@ export function TaskProvider({ children }) {
   };
 
   const createTask = async (task) => {
+
     try {
+
       const res = await createTaskRequest(task);
-      setRefresh(!refresh);
 
+      if (res.status === 200) {
+        setRefresh(!refresh);
 
+      }
+      // }
     } catch (error) {
       console.log(error);
     }
+
   };
 
   const getTask = async (id) => {
@@ -57,9 +66,13 @@ export function TaskProvider({ children }) {
 
   const updateTask = async (id, task) => {
     try {
-      await updateTaskRequest(id, task);
-      setRefresh(!refresh);
+      setLoading(true)
 
+      const res = await updateTaskRequest(id, task);
+      if (res.status === 200) {
+        setRefresh(!refresh);
+        setLoading(false)
+      }
     } catch (error) {
       console.error(error);
     }
@@ -70,6 +83,7 @@ export function TaskProvider({ children }) {
       value={{
         tasks,
         refresh,
+        loading,
         getTasks,
         deleteTask,
         createTask,

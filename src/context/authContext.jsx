@@ -36,26 +36,33 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (user) => {
     try {
+      setLoading(true);
       const res = await registerRequest(user);
       if (res.status === 200) {
         await signin(user)
       }
     } catch (error) {
       setErrors(error.response.data.message);
+      setLoading(false);
     }
   };
 
   const signin = async (user) => {
     try {
+      setLoading(true);
       const res = await loginRequest(user);
-      const tokenHeader = res.headers.get("set-cookie")[0]
-      const token = tokenHeader.split(";")[0].split("=")[1]
-      await AsyncStorage.setItem("token", token);
-      setUser(res.data);
-      setIsAuthenticated(true);
+      if (res.status === 200) {
+        const tokenHeader = res.headers.get("set-cookie")[0]
+        const token = tokenHeader.split(";")[0].split("=")[1]
+        await AsyncStorage.setItem("token", token);
+        setUser(res.data);
+        setIsAuthenticated(true);
+        setLoading(false);
+      }
 
     } catch (error) {
       setErrors(error.response.data.message);
+      setLoading(false);
     }
   };
 
